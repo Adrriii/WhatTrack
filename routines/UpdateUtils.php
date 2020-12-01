@@ -5,6 +5,17 @@ class UpdateUtils {
         $this->dm = $dm;
     }
 
+    function updateAllUsersDay() {
+        $users = $this->dm->getUsers();
+
+        foreach ($users as $user) {
+            $id = $user["id"];
+
+            $this->updateUserDay($id, Date("Y-m-d"));
+        }
+
+    }
+
     function updateUserDay($id, $day) {
         echo "DATE $day - USER $id\n";
 

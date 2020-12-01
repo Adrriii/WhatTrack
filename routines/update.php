@@ -1,10 +1,14 @@
 <?php
 
 require_once("../website/lib/import.php");
+require_once("UpdateUtils.php");
 
 $dm = new DataManager();
+$update = new UpdateUtils($dm);
 
 $users = $dm->getUsers();
+
+echo "--Updating ".count($users)." users\n";
 
 foreach ($users as $user) {
     $id = $user["id"];
@@ -19,6 +23,8 @@ foreach ($users as $user) {
     file_put_contents("users/$id/$id-".date("Y-m-d")."-standard.html",  getHTML("https://whatpulse.org/stats/users/$id/standard/"));
     echo "standard.\n";
 } 
+
+$update->updateAllUsersDay();
 
 function getHTML($address) {
     $ch = curl_init(); 
