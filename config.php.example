@@ -1,0 +1,12 @@
+<?php
+
+global $APP_CONFIG;
+
+$APP_CONFIG = [
+    "db" => [
+        "host" => "localhost",
+        "db" => "whattrack",
+        "user" => "whattrack",
+        "passwd" => "",
+    ]
+];
