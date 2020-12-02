@@ -8,5 +8,9 @@ $APP_CONFIG = [
         "db" => "whattrack",
         "user" => "whattrack",
         "passwd" => "",
+    ],
+    "website" => [
+        "root" => "/var/www/whattrack/website",
+        "url" => "https://whattrack.rhythmgamers.net/",
     ]
 ];

@@ -5,6 +5,8 @@ require_once 'DataManager.php';
 require_once 'Database.php';
 
 require_once 'web/Page.php';
+Page::$project_path = $APP_CONFIG["website"]["root"];
+Page::$project_url = $APP_CONFIG["website"]["url"];
 
 Page::$dm = new DataManager();
 
