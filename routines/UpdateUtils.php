@@ -82,19 +82,51 @@ class UpdateUtils {
         $apps_results = $this->parseApps($computerKeys,"users/$id/$id-$day-apps.html");
 
         echo "INSERTING APPS\n";
+        $already = $this->dm->getAppNames();
         foreach($apps_results[0] as $app) {
-            $this->dm->InsertAppIfNotExists($app["name"]);
+            if(!in_array($app["name"],$already)) {
+                $this->dm->InsertApp($app["name"]);
+            }
+        }
+
+        echo "MERGING APPS\n";
+        $merges = $this->dm->getMergedApps();
+        $apps_merged = [];
+        foreach($apps_results[1] as $app_data) {
+            $apps_merged[$app_data["app"]][$app_data["computer"]] = $app_data;
+        }
+
+        // clean potential remaining data
+        $this->dm->clearChildAppData();
+        
+        foreach($merges as $app_merge) {
+            // merge children inside parents
+            foreach($apps_merged[$app_merge["child"]] as $computer_c => $app_c) {
+                // check if the computer used in child app exists in parent app
+                if(in_array($computer_c, array_keys($apps_merged[$app_merge["parent"]]))) {
+                    // if yes, merge the data
+                    $apps_merged[$app_merge["parent"]][$computer_c]["keytaps"] += $app_c["keytaps"];
+                    $apps_merged[$app_merge["parent"]][$computer_c]["clicks"] += $app_c["clicks"];
+                    $apps_merged[$app_merge["parent"]][$computer_c]["uptime"] += $app_c["uptime"];
+                } else {
+                    // if not, create the field in the parent
+                    $apps_merged[$app_merge["parent"]][$computer_c] = $app_c;
+                }
+            }
         }
 
         echo "INSERTING APPS DATA\n";
-        foreach($apps_results[1] as $app_data) {
-            $this->dm->ReplaceAppsData($day,
-                $app_data["computer"],
-                $app_data["app"],
-                $app_data["keytaps"],
-                $app_data["clicks"],
-                $app_data["uptime"]
-            );
+        foreach($apps_merged as $app_by_computer) {
+            foreach($app_by_computer as $app) {
+                
+                $this->dm->ReplaceAppsData($day,
+                    $app["computer"],
+                    $app["app"],
+                    $app["keytaps"],
+                    $app["clicks"],
+                    $app["uptime"]
+                );
+            }
         }
     }
 
@@ -167,7 +199,7 @@ class UpdateUtils {
                     "clicks" => $clicks,
                     "download" => $download,
                     "upload" => $upload,
-                    "uptime" => $uptime
+                    "uptime" => $this->dm->uptimeToHours($uptime)
                 ]);
             }
         }
@@ -217,7 +249,7 @@ class UpdateUtils {
                             "app" => $title,
                             "keytaps" => $keytaps,
                             "clicks" => $clicks,
-                            "uptime" => $uptime,
+                            "uptime" => $this->dm->uptimeToHours($uptime),
                             "computer" => $computers[$computer],
                         ]);
                     }
@@ -238,7 +270,7 @@ class UpdateUtils {
                         "app" => $last_app,
                         "keytaps" => $keytaps,
                         "clicks" => $clicks,
-                        "uptime" => $uptime,
+                        "uptime" => $this->dm->uptimeToHours($uptime),
                         "computer" => $computers[$computer],
                     ]);
                 }
@@ -252,7 +284,7 @@ class UpdateUtils {
         $contents = file_get_contents($filename);
 
         if(!$contents) {
-            echo "Warning: $filename is empty !";
+            echo "Warning: $filename is empty !\n";
             return null;
         }
 

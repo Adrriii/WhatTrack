@@ -60,6 +60,15 @@ class DataManager {
         return $res;
     }
 
+    public function getAppNames() {
+        $req = "SELECT * FROM app";
+        $appnames = [];
+        foreach($this->fast($req) as $app) {
+            $appnames[] = $app["name"];
+        }
+        return $appnames;
+    }
+
     public function updateUser($id, $username) {
         $opt = [
             ":id" => $id,
@@ -88,7 +97,7 @@ class DataManager {
         return $this->fast($req, $opt);
     }
 
-    public function InsertAppIfNotExists($name) {
+    public function InsertApp($name) {
         $opt = [
             ":name" => $name
         ];
@@ -107,7 +116,7 @@ class DataManager {
             ":clicks" => $clicks,
             ":download" => $this->convertToMBytes($download),
             ":upload" => $this->convertToMBytes($upload),
-            ":uptime" => $this->uptimeToHours($uptime),
+            ":uptime" => $uptime,
         ];
         
         $req = "REPLACE INTO computer_stats (day,computer,pulses,keytaps,clicks,download,upload,uptime)
@@ -134,9 +143,8 @@ class DataManager {
     }
 
     public function ReplaceAppsData($day, $computer, $app, $keytaps, $clicks, $uptime) {
-        $uptime = $this->uptimeToHours($uptime);
 
-        if($uptime<=0) return;
+        if($uptime<1) return;
 
         $opt = [
             ":day" => $day,
@@ -221,6 +229,16 @@ class DataManager {
         $req = "SELECT * FROM computer as c, computer_stats as cs WHERE c.id = cs.computer AND user = :user ORDER BY day DESC";
 
         return $this->fast($req, $opt);
+    }
+
+    public function getMergedApps() {
+        $req = "SELECT * FROM app_merge";
+        return $this->fast($req);
+    }
+
+    public function clearChildAppData() {
+        $req = "DELETE FROM app_stats WHERE app in (SELECT child FROM app_merge)";
+        $this->fast($req);
     }
 
     function convertToMBytes(string $from): ?int {
