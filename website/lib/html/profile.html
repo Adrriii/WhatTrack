@@ -73,10 +73,22 @@
       title: type.charAt(0).toUpperCase() + type.slice(1),
       plot_bgcolor:"#3d3136",
       paper_bgcolor:"#30252a",
+      yaxis: {
+      },
       font: {
         color: "#ffffff"
       }
     };
+
+    if(type == 'download' || type == 'upload') {
+      layout.yaxis.exponentformat = 'SI';
+      layout.yaxis.ticksuffix = 'B';
+      layout.yaxis.tickformat = '.4s';
+    }
+    if(type == 'uptime') {
+      layout.yaxis.ticksuffix = ' hours';
+    }
+
     $.getJSON('/data/getUserTotals.php?user=%USERID%&data='+type, function (data) {
       Plotly.newPlot(type, data, layout);
     });
@@ -94,6 +106,11 @@
         color: "#ffffff"
       }
     };
+    
+    if(type == 'uptime') {
+      layout.yaxis.ticksuffix = ' hours';
+    }
+
     $.getJSON('/data/getUserAppsHist.php?user=%USERID%&data='+type, function (data) {
       Plotly.newPlot("app_"+type, data, layout);
     });
@@ -111,6 +128,16 @@
         color: "#ffffff"
       }
     };
+
+    if(type == 'download' || type == 'upload') {
+      layout.yaxis.exponentformat = 'SI';
+      layout.yaxis.ticksuffix = 'B';
+      layout.yaxis.tickformat = '.4s';
+    }
+    if(type == 'uptime') {
+      layout.yaxis.ticksuffix = ' hours';
+    }
+
     $.getJSON('/data/getUserComputersHist.php?user=%USERID%&data='+type, function (data) {
       Plotly.newPlot("computer_"+type, data, layout);
     });
