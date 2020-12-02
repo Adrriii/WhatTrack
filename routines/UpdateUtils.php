@@ -95,9 +95,6 @@ class UpdateUtils {
         foreach($apps_results[1] as $app_data) {
             $apps_merged[$app_data["app"]][$app_data["computer"]] = $app_data;
         }
-
-        // clean potential remaining data
-        $this->dm->clearChildAppData();
         
         foreach($merges as $app_merge) {
             // merge children inside parents
@@ -128,6 +125,9 @@ class UpdateUtils {
                 );
             }
         }
+
+        // clean potential remaining data
+        $this->dm->clearChildAppData();
     }
 
     function parseStandard($filename) {
