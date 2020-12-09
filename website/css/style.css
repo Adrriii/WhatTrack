@@ -336,3 +336,49 @@ text-align: center;
         width: 100%;
     }
 }
+
+.userlist_name {
+
+}
+
+.userlist_item {
+
+}
+
+.userlist {
+  width: 100%;
+  margin-top: 40px;
+}
+
+.userlist > tbody > tr > th {
+  text-align: center;
+} 
+
+.indexty {
+  width: 80%;
+  margin: auto;
+}
+
+.indexgo {
+  width: 50px;
+  margin: auto;
+}
+
+.userday {
+  font-size: 170%;
+}
+
+.usertoday {
+  width: 50%;
+  margin: auto;
+  padding: 20px;
+}
+
+.usertoday > table {
+  width: 100%;
+  margin-top: 40px;
+}
+
+.usertoday > table > tbody > tr > th {
+  text-align: center;
+} 

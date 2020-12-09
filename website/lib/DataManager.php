@@ -191,6 +191,33 @@ class DataManager {
         return $this->fast($req, $opt);
     }
 
+    
+    public function getUsersCurrentStats() {
+        $req = "SELECT u.id as id,username,SUM(keytaps) as keytaps,SUM(clicks) as clicks,SUM(uptime) as uptime,SUM(download) as download,SUM(upload) as upload FROM user as u, computer as c, computer_stats as cs WHERE u.id = c.user AND c.id = cs.computer AND day = '".date("Y-m-d")."' GROUP BY id ORDER BY keytaps DESC";
+        
+        return $this->fast($req);
+    }
+    
+    public function getUserTodayStats($id) {
+        $opt = [
+            ":id" => $id,
+        ];
+
+        $req = "SELECT SUM(keytaps) as keytaps,SUM(clicks) as clicks,SUM(uptime) as uptime,SUM(download) as download,SUM(upload) as upload FROM user as u, computer as c, computer_stats as cs WHERE u.id = c.user AND c.id = cs.computer AND u.id = :id GROUP BY day ORDER BY day DESC LIMIT 2";
+        
+        $res = $this->fast($req, $opt);
+
+        $rep = [
+            "keytaps" => $res[0]["keytaps"] - $res[1]["keytaps"],
+            "clicks" => $res[0]["clicks"] - $res[1]["clicks"],
+            "download" => $res[0]["download"] - $res[1]["download"],
+            "upload" => $res[0]["upload"] - $res[1]["upload"],
+            "uptime" => $res[0]["uptime"] - $res[1]["uptime"]
+        ];
+
+        return $rep;
+    }
+
     public function getUserRanksHist($id) {
         $opt = [
             ":id" => $id,
@@ -311,5 +338,42 @@ class DataManager {
         }
     
         return (intval($year) * 52.1429 * 7 * 24) + (intval($week) * 7 * 24) + (intval($day) * 24) + intval($hour);
+    }
+    
+
+    function formatBytes($bytes, $precision = 2) { 
+        $units = array('B', 'KB', 'MB', 'GB', 'TB'); 
+    
+        $bytes = max($bytes, 0); 
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024)); 
+        $pow = min($pow, count($units) - 1); 
+    
+        $bytes /= (1 << (10 * $pow)); 
+    
+        return round($bytes, $precision) . ' ' . $units[$pow]; 
+    } 
+
+    function hoursToUptime($hours) {
+        $uptime = "";
+
+        $years = floor($hours / (24*365));
+        if($years > 0) {
+            $hours -= $years * (24*365);
+            $uptime .= "$years"."y";
+        }
+
+        $weeks = floor($hours / (24*7));
+        if($years > 0 || $weeks > 0) {
+            $hours -= $weeks * (24*7);
+            $uptime .= "$weeks"."w";
+        }
+
+        $days = floor($hours / 24);
+        if($years > 0 || $weeks > 0 || $days > 0) {
+            $hours -= $days * 24;
+            $uptime .= "$days"."d";
+        }
+
+        return $uptime.$hours."h";
     }
 }

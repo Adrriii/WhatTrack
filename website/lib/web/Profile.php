@@ -8,6 +8,7 @@ class Profile extends Page {
 
     public function setContent() {
         $user = Page::$dm->getUser($this->userid);
+        $today = Page::$dm->getUserTodayStats($this->userid);
 
         if(!$user) $user = Page::$dm->getUserByName($this->userid);
 
@@ -16,5 +17,11 @@ class Profile extends Page {
 
         $this->replace("%USERNAME%", $user["username"]);
         $this->replace("%USERID%", $user["id"]);
+
+        $this->replace("%TODAY_KEYS%", number_format($today["keytaps"]));
+        $this->replace("%TODAY_CLICKS%", number_format($today["clicks"]));
+        $this->replace("%TODAY_DOWNLOAD%", Page::$dm->formatBytes($today["download"]*1000000));
+        $this->replace("%TODAY_UPLOAD%", Page::$dm->formatBytes($today["upload"]*1000000));
+        $this->replace("%TODAY_UPTIME%", Page::$dm->hoursToUptime($today["uptime"]));
     }
 }
