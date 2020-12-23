@@ -23,5 +23,18 @@ class Profile extends Page {
         $this->replace("%TODAY_DOWNLOAD%", Page::$dm->formatBytes($today["download"]*1000000));
         $this->replace("%TODAY_UPLOAD%", Page::$dm->formatBytes($today["upload"]*1000000));
         $this->replace("%TODAY_UPTIME%", Page::$dm->hoursToUptime($today["uptime"]));
+
+        $this->setAppList();
+    }
+
+    public function setAppList() {
+        $apps = Page::$dm->getAppsNames();
+
+        $option = "<option value='%NAME%'>";
+        $options = "";
+        foreach($apps as $app) {
+            $options .= str_replace("%NAME%", $app["name"], $option);
+        }
+        $this->replace("%APPLIST%", $options);
     }
 }

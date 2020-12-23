@@ -45,6 +45,17 @@
       <div id='computer_upload' style='width: 100%; height: 600px;'></div>
       <div id='computer_uptime' style='width: 100%; height: 600px;'></div>
     </div>
+    <div><button class='btn btn-primary collapsebtn' type='button' data-toggle='collapse' data-target='#appsearch' aria-expanded="true" aria-controls="appsearch">Collapse Specific App stats</button></div>
+    <div id="appsearch" aria-expanded="true" class="collapse in">
+      <input type="text" class="form-control indexty" placeholder="Search for the app name you want to highlight" name="appName" list="applist">
+      <datalist id="applist">
+        %APPLIST%
+      </datalist>
+      <input type="button" class="form-control indexgo" onclick="updateAppStats();" value="Go">
+      <div id='appsearch_keytaps' style='width: 100%; height: 600px;'></div>
+      <div id='appsearch_clicks' style='width: 100%; height: 600px;'></div>
+      <div id='appsearch_uptime' style='width: 100%; height: 600px;'></div>
+    </div>
   </div>
 </header>
 
@@ -67,6 +78,30 @@
     loadComputerGraph("download");
     loadComputerGraph("upload");
     loadComputerGraph("uptime");
+  }
+
+  function updateAppStats() {
+    $.getJSON('/data/getUserAppHist.php?user=%USERID%&app='+(document.getElementsByClassName("indexty")[0].value), function (data) {
+      loadSpecificAppGraph(data, "keytaps");
+      loadSpecificAppGraph(data, "clicks");
+      loadSpecificAppGraph(data, "uptime");
+    });
+  }
+
+  function loadSpecificAppGraph(data, type) {
+    let layout = {
+      title: type.charAt(0).toUpperCase() + type.slice(1),
+      plot_bgcolor:"#3d3136",
+      paper_bgcolor:"#30252a",
+      yaxis: {
+        type: 'log',
+      },
+      font: {
+        color: "#ffffff"
+      }
+    };
+
+    Plotly.newPlot("appsearch_"+type, [data[type]], layout);
   }
     
   function loadRankGraph(type) {

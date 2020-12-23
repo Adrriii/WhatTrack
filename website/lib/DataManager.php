@@ -248,6 +248,23 @@ class DataManager {
         return $this->fast($req, $opt);
     }
 
+    public function getUserAppHist($id, $app) {
+        $opt = [
+            ":id" => $id,
+            ":app" => $app,
+        ];
+
+        $req = "SELECT day,app,SUM(keytaps) as keytaps, SUM(clicks) as clicks, SUM(uptime) as uptime FROM app_stats WHERE app=:app AND computer IN (SELECT id FROM computer WHERE user = :id) GROUP BY day,app ORDER BY day DESC";
+
+        return $this->fast($req, $opt);
+    }
+
+    public function getAppsNames() {
+        $req = "SELECT name FROM app ORDER BY name ASC";
+
+        return $this->fast($req);
+    }
+
     public function getUserComputersHist($id) {
         $opt = [
             ":user" => $id,
