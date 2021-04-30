@@ -98,6 +98,7 @@ class UpdateUtils {
         
         foreach($merges as $app_merge) {
             // merge children inside parents
+            if(!isset($apps_merged[$app_merge["child"]])) continue;
             foreach($apps_merged[$app_merge["child"]] as $computer_c => $app_c) {
                 // check if the computer used in child app exists in parent app
                 if(in_array($computer_c, array_keys($apps_merged[$app_merge["parent"]]))) {
@@ -185,8 +186,8 @@ class UpdateUtils {
                 $pulses = str_replace(',','',trim($tds->item(2)->textContent));
                 $keytaps = str_replace(',','',trim($tds->item(3)->textContent));
                 $clicks = str_replace(',','',trim($tds->item(4)->textContent));
-                $download = trim($tds->item(5)->textContent);
-                $upload = trim($tds->item(6)->textContent);
+                $download = str_replace(',','',trim($tds->item(5)->textContent));
+                $upload = str_replace(',','',trim($tds->item(6)->textContent));
                 $uptime = trim($tds->item(7)->textContent);
 
                 if(!$uptime) $uptime = "0s";
