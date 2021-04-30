@@ -2,8 +2,8 @@
 
 abstract class Page extends PagePart {
 
-    static public $project_path = "/var/www/whattrack/website/";
-    static public $project_url = "https://whattrack.rhythmgamers.net/";
+    static public $project_path;
+    static public $project_url;
     static public $project_title = "WhatTrack";
     
     static public $dm;
